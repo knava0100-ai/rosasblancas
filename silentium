@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRACTAL | Memento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;600&family=IM+Fell+English+SC&family=Mrs+Saint+Delafield&family=Playfair+Display:italic,wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --gold: #b08d57;
+            --text: #e0d9cc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'IM Fell English SC', serif;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+
+        /* CURSOR PERSONALIZADO (AURA DE LUZ) */
+        #cursor {
+            position: fixed; width: 40px; height: 40px; border: 1px solid var(--gold);
+            border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background 0.3s; z-index: 10000;
+        }
+
+        /* CAPA DE POLVO Y RUIDO */
+        .noise {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/dust.png');
+            opacity: 0.1; pointer-events: none; z-index: 9999;
+        }
+
+        /* HERO TRANS LUCIDO */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .hero h1 { 
+            font-family: 'Cormorant SC', serif; font-size: clamp(3rem, 10vw, 8rem); 
+            letter-spacing: 30px; color: var(--gold); z-index: 2; 
+            filter: drop-shadow(0 0 20px rgba(176,141,87,0.3));
+        }
+        .hero-bg-text {
+            position: absolute; font-family: 'Mrs Saint Delafield', cursive;
+            font-size: 20rem; opacity: 0.03; white-space: nowrap; pointer-events: none;
+        }
+
+        /* EL MOSAICO INSANO (GRID FRACTAL) */
+        .fractal-grid {
+            display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: 250px;
+            gap: 15px; padding: 20px; max-width: 1400px; margin: 0 auto;
+        }
+
+        .tile {
+            position: relative; overflow: hidden; background: var(--glass);
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        /* Tamaños asimétricos para el mosaico */
+        .tile-w2 { grid-column: span 2; }
+        .tile-h2 { grid-row: span 2; }
+
+        .tile img {
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.4;
+            filter: grayscale(1) contrast(1.2); transition: 1s;
+        }
+
+        .tile:hover {
+            transform: scale(0.98); border-color: var(--gold);
+            box-shadow: inset 0 0 50px rgba(176,141,87,0.2);
+        }
+
+        .tile:hover img { opacity: 0.9; filter: grayscale(0) contrast(1); transform: scale(1.1); }
+
+        .tile-content {
+            position: absolute; bottom: -100%; left: 0; width: 100%;
+            padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            transition: 0.6s; font-family: 'Playfair Display', serif; font-style: italic;
+        }
+
+        .tile:hover .tile-content { bottom: 0; }
+
+        /* SECCIÓN DE POESÍA FLOTANTE */
+        .floating-verse {
+            height: 100vh; display: flex; justify-content: center; align-items: center;
+            perspective: 1000px;
+        }
+        .verse-card {
+            padding: 80px; background: rgba(255,255,255,0.02); border: 1px solid rgba(176,141,87,0.1);
+            transform: rotateY(15deg) rotateX(5deg); transition: 1s;
+            max-width: 800px; text-align: center;
+        }
+        .verse-card:hover { transform: rotateY(0deg) rotateX(0deg); background: rgba(255,255,255,0.05); }
+        .verse-card p { font-size: 2.5rem; line-height: 1.6; color: var(--gold); }
+
+        /* RITUAL DE CENIZA NEON-VINTAGE */
+        footer { padding: 150px 10%; background: #000; border-top: 1px solid #222; text-align: center; }
+        .ash-input {
+            width: 100%; max-width: 800px; height: 150px; background: transparent;
+            border: none; border-bottom: 1px solid #444; color: var(--text);
+            font-size: 2rem; text-align: center; font-family: 'Playfair Display'; outline: none;
+            transition: 1s; margin-bottom: 50px;
+        }
+        .ash-input:focus { border-color: var(--gold); text-shadow: 0 0 15px var(--gold); }
+
+        .burn-trigger {
+            padding: 20px 60px; background: transparent; border: 1px solid var(--gold);
+            color: var(--gold); font-family: 'Cormorant SC'; letter-spacing: 15px;
+            cursor: pointer; transition: 0.5s; overflow: hidden; position: relative;
+        }
+        .burn-trigger:hover { background: var(--gold); color: black; box-shadow: 0 0 50px var(--gold); }
+
+        .fade-in { opacity: 0; transform: translateY(50px); transition: 1.5s; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div class="noise"></div>
+
+<div class="hero">
+    <div class="hero-bg-text">MEMENTO ALBA</div>
+    <h1 class="fade-in">SILENTIUM</h1>
+    <p class="fade-in" style="font-size: 2rem; color: #666;">El mosaico de las almas rotas</p>
+</div>
+
+<section>
+    <div class="fractal-grid">
+        <div class="tile tile-w2 tile-h2 fade-in">
+            <img src="E1ef2bd136977b07c760fa351130b8a6.jpg">
+            <div class="tile-content">"Fragmento I: El inicio del olvido."</div>
+        </div>
+        <div class="tile fade-in">
+            <img src="f5bdedecbc242032fcc7665483137449.jpg">
+            <div class="tile-content">"Eco"</div>
+        </div>
+        <div class="tile tile-h2 fade-in">
+            <img src="c65d7b4a698c93e18e2a5d9c36b0269e.jpg">
+            <div class="tile-content">"Cenizas del ayer."</div>
+        </div>
+        <div class="tile tile-w2 fade-in">
+            <img src="ceaf763cf9cc071563c1fd39d03b8018.jpg">
+            <div class="tile-content">"El silencio que compartimos."</div>
+        </div>
+        <div class="tile fade-in">
+            <img src="c973f4c04727d7d16b99707c5b63bb2f.jpg">
+            <div class="tile-content">"Nostalgia pura."</div>
+        </div>
+        <div class="tile tile-w2 fade-in">
+            <img src="818d92ebee3732ea960eb890b89cbf8e.jpg">
+            <div class="tile-content">"Abismo profundo."</div>
+        </div>
+        <div class="tile fade-in">
+            <img src="8c4afea53d9c43911e034a1e64e2108d.jpg">
+            <div class="tile-content">"Fragmento VII"</div>
+        </div>
+        <div class="tile tile-w2 fade-in">
+            <img src="fbe216589ed1ef59bca8cacc1bd33db0.jpg">
+            <div class="tile-content">"Eternidad sellada."</div>
+        </div>
+    </div>
+</section>
+
+<section class="floating-verse">
+    <div class="verse-card fade-in">
+        <p>"No busques la luz en el reflejo, búscala en la grieta del muro antiguo. Somos el rastro de una tinta que se agota."</p>
+    </div>
+</section>
+
+<footer>
+    <div class="fade-in">
+        <input type="text" class="ash-input" id="ash" placeholder="Escribe tu secreto y suéltalo...">
+        <br>
+        <button class="burn-trigger" onclick="burnOut()">PURIFICAR</button>
+    </div>
+    <p style="margin-top: 100px; opacity: 0.1; letter-spacing: 10px; font-size: 0.7rem;">MEMENTO ALBA • 2026 • SIN RASTRO</p>
+</footer>
+
+<script>
+    // CURSOR INTERACTIVO
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+    });
+
+    document.querySelectorAll('button, .tile').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            cursor.style.width = '80px';
+            cursor.style.height = '80px';
+            cursor.style.background = 'rgba(176,141,87,0.1)';
+        });
+        el.addEventListener('mouseleave', () => {
+            cursor.style.width = '40px';
+            cursor.style.height = '40px';
+            cursor.style.background = 'transparent';
+        });
+    });
+
+    // EFECTO DE QUEMA
+    function burnOut() {
+        const input = document.getElementById('ash');
+        if(!input.value) return;
+        input.style.filter = "blur(20px) brightness(2)";
+        input.style.letterSpacing = "20px";
+        input.style.opacity = "0";
+        setTimeout(() => {
+            alert("El secreto ha sido devorado por el mosaico.");
+            input.value = "";
+            input.style.filter = "none";
+            input.style.opacity = "1";
+            input.style.letterSpacing = "0px";
+        }, 2000);
+    }
+
+    // OBSERVER
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>
