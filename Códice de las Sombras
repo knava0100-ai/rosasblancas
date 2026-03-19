@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMENTO | El Códice de las Sombras</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC&family=IM+Fell+English+SC&family=Mrs+Saint+Delafield&family=Playfair+Display:italic,wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f2ede4;
+            --ink: #1a1a1a;
+            --gold: #b08d57;
+            --sepia-dark: #3a2f23;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
+
+        body {
+            background-color: var(--bg);
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            color: var(--ink);
+            font-family: 'IM Fell English SC', serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* CAPA DE POLVO Y GRANO CINEMATOGRÁFICO */
+        .film-grain {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/dust.png');
+            opacity: 0.25; pointer-events: none; z-index: 2000;
+        }
+
+        .fade-in { opacity: 0; transform: translateY(50px); transition: 2s all cubic-bezier(0.2, 1, 0.3, 1); }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        /* HERO - LA ENTRADA AL ABISMO */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1518131348481-9878207907f1?q=80&w=1800');
+            background-size: cover; background-attachment: fixed; text-align: center; color: white;
+            border-bottom: 2px solid var(--gold);
+        }
+        .hero h1 { font-family: 'Cormorant SC', serif; font-size: clamp(3rem, 8vw, 6rem); letter-spacing: 25px; color: var(--gold); text-shadow: 0 0 20px rgba(176,141,87,0.5); }
+        .hero p { font-family: 'Mrs Saint Delafield', cursive; font-size: clamp(2rem, 5vw, 4rem); opacity: 0.8; margin-top: 10px; }
+
+        section { padding: 150px 10%; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .title-small { font-family: 'Cormorant SC', serif; font-size: 0.8rem; letter-spacing: 12px; text-transform: uppercase; color: var(--gold); margin-bottom: 60px; text-align: center; width: 100%; }
+
+        /* 1. EL HERBARIO TACTIL */
+        .specimen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .specimen {
+            border: 1px solid rgba(176,141,87,0.2); padding: 25px; background: rgba(255,255,255,0.4);
+            text-align: center; transition: 0.8s; cursor: pointer; position: relative; overflow: hidden;
+        }
+        .specimen:hover { border-color: var(--gold); transform: translateY(-15px) rotate(1deg); background: #fffdf9; box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
+        .specimen img { width: 100%; height: 450px; object-fit: cover; filter: sepia(0.9) grayscale(0.2); transition: 1.2s; }
+        .specimen:hover img { filter: sepia(0) grayscale(0) scale(1.05); }
+        .hidden-poem { height: 0; opacity: 0; overflow: hidden; transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-style: italic; color: var(--sepia-dark); font-size: 1.3rem; line-height: 1.4; }
+        .specimen.active .hidden-poem { height: auto; opacity: 1; margin-top: 25px; padding-bottom: 10px; }
+
+        /* 2. POESÍA DE CRISTAL ROTO */
+        .glass-poetry {
+            max-width: 900px; margin: 0 auto; text-align: center; padding: 100px 40px;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);
+            border: 1px solid rgba(176,141,87,0.1); position: relative;
+        }
+        .glass-poetry::before { content: '“'; position: absolute; top: 0; left: 20px; font-size: 8rem; color: var(--gold); opacity: 0.2; }
+        .long-poetry { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-style: italic; line-height: 2.5; }
+
+        /* 3. GALERÍA MÁQUINA DEL TIEMPO (Auto-Scroll) */
+        .time-machine { width: 100vw; margin-left: -10%; overflow: hidden; background: #1a1a1a; padding: 80px 0; border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); }
+        .track { display: flex; width: calc(400px * 16); animation: travel 50s linear infinite; }
+        .track:hover { animation-play-state: paused; }
+        .card { width: 350px; margin: 0 30px; background: #e0d9cc; padding: 15px 15px 60px 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: rotate(calc(-3deg + 6deg * var(--r))); transition: 0.5s; }
+        .card:hover { transform: rotate(0) scale(1.1); z-index: 10; cursor: zoom-in; }
+        .card img { width: 100%; height: 400px; object-fit: cover; filter: grayscale(1) sepia(0.3); }
+        .card p { font-family: 'Mrs Saint Delafield', cursive; font-size: 2.5rem; text-align: center; margin-top: 20px; color: #333; }
+        @keyframes travel { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-400px * 8)); } }
+
+        /* 4. EL REVELADO ALQUÍMICO */
+        .alchemy-box {
+            background: #000; color: transparent; padding: 120px 40px; text-align: center;
+            font-size: clamp(1.5rem, 4vw, 2.5rem); transition: 3s; cursor: wait; border: 1px solid var(--gold);
+            margin: 60px auto; max-width: 1000px; line-height: 1.8;
+        }
+        .alchemy-box:hover { color: rgba(212, 175, 55, 0.9); text-shadow: 0 0 20px var(--gold); }
+
+        /* 5. EL RITUAL DE CENIZAS */
+        footer { background: #080808; color: #444; padding: 150px 10%; text-align: center; border-top: 5px solid #000; }
+        .shadow-textarea {
+            width: 100%; max-width: 800px; height: 250px; background: transparent;
+            border: 1px solid #222; color: var(--gold); padding: 35px;
+            font-family: 'IM Fell English SC', serif; font-size: 1.6rem; margin: 40px auto;
+            outline: none; transition: 2s; border-radius: 5px;
+        }
+        .shadow-textarea:focus { border-color: var(--gold); box-shadow: 0 0 20px rgba(176,141,87,0.1); }
+        .burn-button {
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            padding: 20px 80px; letter-spacing: 15px; cursor: pointer; transition: 0.6s;
+            font-family: 'Cormorant SC', serif; font-weight: bold; font-size: 1.2rem;
+        }
+        .burn-button:hover { background: var(--gold); color: black; box-shadow: 0 0 50px var(--gold); transform: scale(1.05); }
+
+        .end-note { margin-top: 100px; opacity: 0.1; font-size: 0.8rem; letter-spacing: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="film-grain"></div>
+
+<div class="hero">
+    <h1 class="fade-in">MEMENTO ALBA</h1>
+    <p class="fade-in">El herbario de lo que no pudo ser</p>
+</div>
+
+<section>
+    <p class="title-small">I. EL GABINETE BOTÁNICO (Toca para despertar el eco)</p>
+    <div class="specimen-grid">
+        <div class="specimen fade-in" onclick="this.classList.toggle('active')">
+            <img src="E1ef2bd136977b07c760fa351130b8a6.jpg" alt="Especimen">
+            <h3 style="margin-top:20px; letter-spacing:4px;">Especímen 01</h3>
+            <div class="hidden-poem">"Hay fragmentos de ti que el tiempo nunca podrá devorar."</div>
+        </div>
+        <div class="specimen fade-in" onclick="this.classList.toggle('active')">
+            <img src="f5bdedecbc242032fcc7665483137449.jpg" alt="Especimen">
+            <h3 style="margin-top:20px; letter-spacing:4px;">Especímen 02</h3>
+            <div class="hidden-poem">"Somos la pausa entre dos latidos que se buscan en la sombra."</div>
+        </div>
+        <div class="specimen fade-in" onclick="this.classList.toggle('active')">
+            <img src="c65d7b4a698c93e18e2a5d9c36b0269e.jpg" alt="Especimen">
+            <h3 style="margin-top:20px; letter-spacing:4px;">Especímen 03</h3>
+            <div class="hidden-poem">"El olvido es un jardín que siempre florece de noche."</div>
+        </div>
+    </div>
+</section>
+
+<section style="background: rgba(0,0,0,0.02);">
+    <div class="glass-poetry fade-in">
+        <div class="long-poetry">
+            "No busques el rastro en el mapa,<br>
+            búscalo en la grieta del piano mudo.<br>
+            Heredamos los restos de una luz que ya no calienta,<br>
+            un mapa de caricias que se perdieron en el invierno.<br>
+            Somos el rastro de una tinta que se agota."
+        </div>
+    </div>
+</section>
+
+<section style="padding: 0;">
+    <p class="title-small" style="margin-top: 100px;">II. EL ARCHIVO DE AUSENCIAS (Carrusel de Sueños)</p>
+    <div class="time-machine">
+        <div class="track">
+            <div class="card" style="--r: 0.8"><img src="ceaf763cf9cc071563c1fd39d03b8018.jpg"><p>Silencio</p></div>
+            <div class="card" style="--r: 0.2"><img src="c973f4c04727d7d16b99707c5b63bb2f.jpg"><p>Nostalgia</p></div>
+            <div class="card" style="--r: 0.9"><img src="818d92ebee3732ea960eb890b89cbf8e.jpg"><p>Abismo</p></div>
+            <div class="card" style="--r: 0.4"><img src="8c4afea53d9c43911e034a1e64e2108d.jpg"><p>Ceniza</p></div>
+            <div class="card" style="--r: 0.7"><img src="fbe216589ed1ef59bca8cacc1bd33db0.jpg"><p>Eternidad</p></div>
+            <div class="card" style="--r: 0.3"><img src="ceaf763cf9cc071563c1fd39d03b8018.jpg"><p>Silencio</p></div>
+            <div class="card" style="--r: 0.6"><img src="c973f4c04727d7d16b99707c5b63bb2f.jpg"><p>Nostalgia</p></div>
+            <div class="card" style="--r: 0.1"><img src="818d92ebee3732ea960eb890b89cbf8e.jpg"><p>Abismo</p></div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <p class="title-small">III. EL PENSAMIENTO PROHIBIDO (Pasa el cursor sobre la oscuridad)</p>
+    <div class="alchemy-box fade-in">
+        "Escribir es la única forma de morir sin que nadie se dé cuenta, <br> y de vivir para siempre en la mente de un extraño."
+    </div>
+</section>
+
+<footer>
+    <div class="fade-in">
+        <h2 style="color: var(--gold); letter-spacing: 20px; font-size: clamp(2rem, 6vw, 4rem);">SILENTIUM</h2>
+        <p style="margin: 30px 0; font-style: italic; font-size: 1.5rem;">Escribe aquello que no le dirías a nadie...</p>
+        <textarea id="ashes" class="shadow-textarea" placeholder="Tu secreto aquí..."></textarea><br>
+        <button class="burn-button" onclick="performRitual()">ENTREGAR AL OLVIDO</button>
+    </div>
+    <p class="end-note">SIN NOMBRE • ESTÉTICA DE LA DECADENCIA • 1892-2026</p>
+</footer>
+
+<script>
+    // Función de desintegración visual (Mejorada)
+    function performRitual() {
+        const area = document.getElementById('ashes');
+        if(area.value.trim() === "") return;
+
+        area.style.transition = "all 3s cubic-bezier(0.4, 0, 0.2, 1)";
+        area.style.filter = "blur(30px) brightness(2) grayscale(1)";
+        area.style.opacity = "0";
+        area.style.transform = "scale(0.5) rotate(5deg) translateY(-100px)";
+        
+        setTimeout(() => {
+            alert("Tu pensamiento ha sido transformado en silencio eterno.");
+            area.value = "";
+            area.style.filter = "none";
+            area.style.opacity = "1";
+            area.style.transform = "scale(1) rotate(0) translateY(0)";
+        }, 3200);
+    }
+
+    // Observador para animaciones suaves al bajar
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) e.target.classList.add('visible');
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Añadir aleatoriedad a las rotaciones de las polaroids
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.setProperty('--r', Math.random());
+    });
+</script>
+
+</body>
+</html>
