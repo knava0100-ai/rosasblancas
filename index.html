@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMENTO | Silencio y Ausencia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f5f5f0; /* Crema lino */
+            --text-color: #2c2c2c; /* Carbón suave */
+            --accent-color: #a8a8a8; /* Gris etéreo */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Cormorant Garamond', serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Efecto de grano de película */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Animación de entrada */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 2s ease, transform 2s ease;
+        }
+
+        .visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Pantalla de Inicio */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .rose-container {
+            width: 280px;
+            filter: grayscale(100%) sepia(20%);
+            margin-bottom: 30px;
+            transition: filter 1.5s ease;
+        }
+
+        .rose-container:hover {
+            filter: grayscale(30%);
+        }
+
+        .hero h1 {
+            font-weight: 300;
+            letter-spacing: 8px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--accent-color);
+        }
+
+        /* Secciones de Poesía */
+        section {
+            padding: 150px 10%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .poetry-block {
+            font-size: 2.2rem;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 100px;
+        }
+
+        .fragment {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        /* Galería Minimalista */
+        .gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-top: 50px;
+        }
+
+        .item {
+            text-align: left;
+        }
+
+        .item p {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        /* Footer */
+        footer {
+            height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a1a;
+            color: #f5f5f0;
+            text-align: center;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 5px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-5px);}
+            60% {transform: translateY(-3px);}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <div class="rose-container">
+            <img src="https://images.unsplash.com/photo-1596003903067-bf5762ad5c19?q=80&w=1000&auto=format&fit=crop" alt="Rosa Blanca" style="width: 100%; border-radius: 50%;">
+        </div>
+        <h1 class="fade-in">MEMENTO</h1>
+        <p class="fade-in" style="margin-top: 20px; font-style: italic;">"Lo que no se dice, pesa más que el cuerpo."</p>
+        <div class="scroll-indicator">SCROLL</div>
+    </div>
+
+    <section>
+        <div class="fade-in poetry-block">
+            <span class="fragment">I. La Herencia</span>
+            "Heredamos los restos de una luz que ya no calienta,<br>
+            un mapa de caricias que se perdieron en el invierno.<br>
+            No es que hayamos olvidado cómo hablar,<br>
+            es que las palabras ya no encuentran el camino de regreso."
+        </div>
+    </section>
+
+    <section>
+        <span class="fragment" style="text-align: center;">II. Objetos Huérfanos</span>
+        <div class="gallery">
+            <div class="item fade-in">
+                <div style="width: 100%; height: 300px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-style: italic; color: #999;">[Imagen: Silla Vacía]</div>
+                <p>El espacio exacto donde la ausencia toma cuerpo.</p>
+            </div>
+            <div class="item fade-in" style="margin-top: 50px;">
+                <div style="width: 100%; height: 300px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-style: italic; color: #999;">[Imagen: Carta Lacre]</div>
+                <p>Todo lo que el miedo nos obligó a callar para siempre.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="fade-in poetry-block" style="font-size: 1.5rem;">
+            <span class="fragment">III. Silentium</span>
+            "Somos el rastro de un gramófono que gira en el vacío,<br>
+            la aguja que busca una melodía en el polvo de una casa desierta.<br>
+            La memoria es una habitación blanca donde siempre falta alguien."
+        </div>
+    </section>
+
+    <footer class="fade-in">
+        <div>
+            <h2 style="font-weight: 300; letter-spacing: 5px;">FIN</h2>
+            <p style="font-style: italic; margin-top: 10px; opacity: 0.7;">Al final, solo queda la luz que atraviesa el polvo.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Script para activar animaciones al hacer scroll
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
